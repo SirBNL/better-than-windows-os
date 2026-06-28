@@ -1,0 +1,21 @@
+# Better Than Windows OS - boot splash (scales wallpaper to fill screen)
+wallpaper = Image("background.png");
+sw = Window.GetWidth();
+sh = Window.GetHeight();
+iw = wallpaper.GetWidth();
+ih = wallpaper.GetHeight();
+scale = sw / iw;
+if (sh / ih > scale)
+    scale = sh / ih;
+wallpaper = wallpaper.Scale(iw * scale, ih * scale);
+bg = Sprite(wallpaper);
+bg.SetX((sw - wallpaper.GetWidth()) / 2);
+bg.SetY((sh - wallpaper.GetHeight()) / 2);
+bg.SetZ(-100);
+
+# pulsing loading indicator
+state = 0;
+fun refresh_cb() {
+    state++;
+}
+Plymouth.SetRefreshFunction(refresh_cb);

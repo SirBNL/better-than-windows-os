@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e
+echo "==> [hook] Applying Better Than Windows OS branding..."
+
+# ---- OS identity ----
+cat > /etc/os-release <<'EOF'
+NAME="Better Than Windows OS"
+PRETTY_NAME="Better Than Windows OS"
+ID=btwos
+ID_LIKE=debian
+VERSION="1.0 (Seven)"
+VERSION_ID="1.0"
+HOME_URL="https://better-than-windows.invalid"
+SUPPORT_URL="https://better-than-windows.invalid"
+EOF
+
+echo "better-than-windows" > /etc/hostname
+printf 'Better Than Windows OS \\n \\l\n\n' > /etc/issue
+echo "Welcome to Better Than Windows OS" > /etc/motd
+sed -i 's/^PRETTY_NAME=.*/PRETTY_NAME="Better Than Windows OS"/' /usr/lib/os-release 2>/dev/null || true
+
+# ---- Windows 7 GTK theme + icons (B00merang community project) ----
+mkdir -p /usr/share/themes /usr/share/icons
+if git clone --depth=1 https://github.com/B00merang-Project/Windows-7.git /tmp/win7-theme 2>/dev/null; then
+    cp -r /tmp/win7-theme /usr/share/themes/Windows-7
+    rm -rf /tmp/win7-theme
+    echo "==> [hook] Windows-7 GTK theme installed."
+else
+    echo "==> [hook] WARN: could not fetch Win7 GTK theme, falling back to Arc."
+    sed -i 's/Windows-7/Arc/g' /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/*.xml 2>/dev/null || true
+    sed -i 's/Windows-7/Arc/g' /etc/lightdm/lightdm-gtk-greeter.conf 2>/dev/null || true
+fi
+
+if git clone --depth=1 https://github.com/B00merang-Artwork/Windows-7.git /tmp/win7-icons 2>/dev/null; then
+    cp -r /tmp/win7-icons /usr/share/icons/Windows-7-icons
+    rm -rf /tmp/win7-icons
+    gtk-update-icon-cache -f /usr/share/icons/Windows-7-icons 2>/dev/null || true
+    echo "==> [hook] Windows-7 icon theme installed."
+else
+    echo "==> [hook] WARN: could not fetch Win7 icons, falling back to Papirus."
+    sed -i 's/Windows-7-icons/Papirus/g' /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/*.xml 2>/dev/null || true
+    sed -i 's/Windows-7-icons/Papirus/g' /etc/lightdm/lightdm-gtk-greeter.conf 2>/dev/null || true
+fi
+
+# ---- Boot splash (Plymouth) ----
+plymouth-set-default-theme btw-logo 2>/dev/null || plymouth-set-default-theme spinner 2>/dev/null || true
+update-initramfs -u 2>/dev/null || true
+
+echo "==> [hook] Branding done."

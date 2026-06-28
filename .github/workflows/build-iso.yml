@@ -1,0 +1,67 @@
+name: Build Better Than Windows OS ISO
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
+          df -h
+
+      - name: Install live-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap git ca-certificates curl dos2unix xorriso squashfs-tools mtools
+
+      - name: Normalize line endings & permissions
+        run: |
+          find auto config -type f -print0 | xargs -0 dos2unix -q || true
+          chmod +x auto/config config/hooks/normal/*.hook.chroot || true
+
+      - name: Build ISO
+        run: |
+          sudo lb config
+          sudo lb build
+          ls -lh *.iso
+
+      - name: Prepare ISO artifact
+        run: |
+          ISO=$(ls *.iso | head -n1)
+          sudo cp "$ISO" better-than-windows-os.iso
+          sudo chmod a+r better-than-windows-os.iso
+          sha256sum better-than-windows-os.iso | tee better-than-windows-os.iso.sha256
+          ls -lh better-than-windows-os.iso
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0
+          name: Better Than Windows OS v1.0
+          body: |
+            Live ISO of **Better Than Windows OS** (Debian Bookworm + XFCE, Windows 7 look-and-feel).
+            Boot it in a VM (qemu/VirtualBox) or write to USB with Rufus/balenaEtcher.
+          files: |
+            better-than-windows-os.iso
+            better-than-windows-os.iso.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ISO as workflow artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: better-than-windows-os-iso
+          path: better-than-windows-os.iso
+          retention-days: 7
+          if-no-files-found: error

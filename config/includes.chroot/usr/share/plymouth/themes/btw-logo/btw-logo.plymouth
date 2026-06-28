@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Better Than Windows OS
+Description=Better Than Windows OS boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/btw-logo
+ScriptFile=/usr/share/plymouth/themes/btw-logo/btw-logo.script

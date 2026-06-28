@@ -1,0 +1,41 @@
+# X / display
+xorg
+xserver-xorg
+lightdm
+lightdm-gtk-greeter
+
+# XFCE desktop (lightweight, very themeable -> Windows 7 look)
+xfce4
+xfce4-goodies
+xfce4-whiskermenu-plugin
+xfce4-panel
+xfwm4
+xfdesktop4
+thunar
+
+# Theming engines & fonts & icons (fallbacks; Win7 theme cloned in hook)
+gtk2-engines-murrine
+gtk2-engines-pixbuf
+arc-theme
+papirus-icon-theme
+fonts-dejavu
+fonts-liberation
+
+# Boot splash branding
+plymouth
+plymouth-themes
+
+# Networking & everyday apps
+network-manager-gnome
+firefox-esr
+mousepad
+ristretto
+file-roller
+xarchiver
+galculator
+
+# Utilities used by the branding hook
+git
+ca-certificates
+curl
+sudo

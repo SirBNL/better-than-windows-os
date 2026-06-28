@@ -7,14 +7,12 @@ lb config noauto \
     --architectures amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
     --binary-images iso-hybrid \
-    --debian-installer none \
+    --debian-installer false \
     --apt-indices false \
     --security false \
-    --firmware-chroot false \
-    --firmware-binary false \
-    --mirror-bootstrap "http://deb.debian.org/debian" \
-    --mirror-chroot "http://deb.debian.org/debian" \
-    --mirror-binary "http://deb.debian.org/debian" \
+    --mirror-bootstrap "http://deb.debian.org/debian/" \
+    --mirror-chroot "http://deb.debian.org/debian/" \
+    --mirror-binary "http://deb.debian.org/debian/" \
     --iso-application "Better Than Windows OS" \
     --iso-volume "BTW_OS" \
     --iso-preparer "Better Than Windows OS build kit" \

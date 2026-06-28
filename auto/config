@@ -4,9 +4,17 @@ set -e
 lb config noauto \
     --distribution bookworm \
     --architectures amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
     --binary-images iso-hybrid \
     --debian-installer none \
-    --archive-areas "main contrib non-free non-free-firmware" \
+    --apt-indices false \
+    --security true \
+    --updates true \
+    --mirror-bootstrap "http://deb.debian.org/debian/" \
+    --mirror-chroot "http://deb.debian.org/debian/" \
+    --mirror-chroot-security "http://security.debian.org/debian-security/" \
+    --mirror-binary "http://deb.debian.org/debian/" \
+    --mirror-binary-security "http://security.debian.org/debian-security/" \
     --iso-application "Better Than Windows OS" \
     --iso-volume "BTW_OS" \
     --iso-preparer "Better Than Windows OS build kit" \

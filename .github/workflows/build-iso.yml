@@ -10,20 +10,26 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm
+      options: --privileged
     timeout-minutes: 120
     steps:
+      - name: Install prerequisites (git for checkout + live-build toolchain)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            git ca-certificates curl dos2unix \
+            live-build debootstrap debian-archive-keyring \
+            xorriso squashfs-tools mtools dosfstools \
+            isolinux syslinux-common syslinux \
+            grub-pc-bin grub-efi-amd64-bin
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Free up disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
-          df -h
-
-      - name: Install live-build & Debian keyring
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y live-build debootstrap debian-archive-keyring git ca-certificates curl dos2unix xorriso squashfs-tools mtools
+      - name: Show disk space
+        run: df -h
 
       - name: Normalize line endings & permissions
         run: |
@@ -32,15 +38,15 @@ jobs:
 
       - name: Build ISO
         run: |
-          sudo lb config
-          sudo lb build
+          lb config
+          lb build
           ls -lh *.iso
 
       - name: Prepare ISO artifact
         run: |
           ISO=$(ls *.iso | head -n1)
-          sudo cp "$ISO" better-than-windows-os.iso
-          sudo chmod a+r better-than-windows-os.iso
+          cp "$ISO" better-than-windows-os.iso
+          chmod a+r better-than-windows-os.iso
           sha256sum better-than-windows-os.iso | tee better-than-windows-os.iso.sha256
           ls -lh better-than-windows-os.iso
 
